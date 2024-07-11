@@ -11,8 +11,7 @@ public:
 	void push(T obj) { // потокобезопасная запись объекта в очередь
 		std::unique_lock<std::mutex> lk(mutex);
 		queue_.push(obj);
-		lk.unlock(); // нужно ли?
-		newTask.notify_one(); // оповещаем один из ожидающих потоков
+		newTask.notify_one(); // оповещаем любой из ожидающих потоков
 	}
 
 	bool pop(T& obj) { // потокобезопасные получение элемента очереди с проталкиванием
@@ -24,7 +23,7 @@ public:
 		return true;
 	}
 
-	void stop() { // выводит метод pop из режима ожидания новой задачи, метод pop при этом возвращает nullptr
+	void stop() { // выводит метод pop из режима ожидания новой задачи, метод pop при этом возвращает false
 		stopFlag = true;
 		newTask.notify_all(); // оповещаем все ожидающие потоки
 	}
